@@ -1,6 +1,6 @@
 //
-//  FracModel.swift
-//  Fract
+//  Scene.swift
+//  R2
 //
 //  Created by Charles Jacobs on 12/12/14.
 //  Copyright (c) 2014 FloydSoft. All rights reserved.
@@ -12,11 +12,11 @@ import Cocoa
 
 func getPath(poly: [NSPoint]) -> NSBezierPath
 {
-    var result = NSBezierPath()
+    let result = NSBezierPath()
 
     for index in 0 ..< poly.count-1 // skip last point (because we're going to call closePath()
     {
-        var pt = poly[index]
+        let pt = poly[index]
         if index == 0
         {
             result.moveToPoint(pt)
@@ -54,7 +54,7 @@ class Shape: NSObject
         var newPoly = originalPolygon
         for iter in 0 ..< subdivisionLevel
         {
-            newPoly = subdividePoly(newPoly, subdivideFunc)
+            newPoly = subdividePoly(newPoly, subFn: subdivideFunc)
         }
         return newPoly
     }
@@ -66,8 +66,7 @@ class Shape: NSObject
     }
 }
 
-// FractModel contains the scene (maybe we should call it FractScene?)
-class FractModel: NSObject
+class Scene: NSObject
 {
     var shapes: [Shape] = []
     

@@ -1,6 +1,6 @@
 //
-//  FractTests.swift
-//  FractTests
+//  R2Tests.swift
+//  R2Tests
 //
 //  Created by Charles Jacobs on 12/9/14.
 //  Copyright (c) 2014 FloydSoft. All rights reserved.
@@ -9,7 +9,7 @@
 import Cocoa
 import XCTest
 
-class FractTests: XCTestCase {
+class R2Tests: XCTestCase {
     
     override func setUp() {
         super.setUp()

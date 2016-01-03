@@ -15,8 +15,8 @@ func perpVec(v: NSPoint) -> NSPoint
 
 func length(v: NSPoint) -> Double
 {
-    var x = Double(v.x)
-    var y = Double(v.y)
+    let x = Double(v.x)
+    let y = Double(v.y)
     return sqrt(x*x + y*y)
 }
 

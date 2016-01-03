@@ -28,9 +28,9 @@ class SVGExporter: NSObject
     
     func getStringForPath(path: NSBezierPath) -> String
     {
-        var components = NSMutableArray(capacity: 1)
+        let components = NSMutableArray(capacity: 1)
 
-        var pointArray = NSPointArray.alloc(3)
+        let pointArray = NSPointArray.alloc(3)
         for index in 0 ..< path.elementCount
         {
             let elementType = path.elementAtIndex(index, associatedPoints: pointArray)
@@ -50,15 +50,15 @@ class SVGExporter: NSObject
         }
         pointArray.dealloc(3);
         
-        var resultString = components.componentsJoinedByString(" ")
+        let resultString = components.componentsJoinedByString(" ")
         return resultString;
     }
     
     func addPath(path: NSBezierPath)
     {
         NSLog("adding path");
-        var pathNode = NSXMLElement(name:"path")
-        var attributes = NSMutableDictionary(capacity: 3)
+        let pathNode = NSXMLElement(name:"path")
+        var attributes = [String: String]()
         attributes["style"] = "stroke:black; fill:none"
         attributes["stroke-width"] = "0.01"
         
@@ -69,12 +69,12 @@ class SVGExporter: NSObject
     
     func addPolygon(poly: Polygon)
     {
-        var pathNode = NSXMLElement(name:"polygon")
-        var attributes = NSMutableDictionary(capacity: 3)
+        let pathNode = NSXMLElement(name:"polygon")
+        var attributes = [String: String]()
         attributes["style"] = "stroke:black; fill:none"
         attributes["stroke-width"] = "0.01"
-        let ptStrings = map(poly) { "\($0.x),\($0.y)" }
-        let pathString = " ".join(ptStrings)
+        let ptStrings = poly.map { "\($0.x),\($0.y)" }
+        let pathString = ptStrings.joinWithSeparator(" ")
         attributes["points"] = pathString
         pathNode.setAttributesWithDictionary(attributes)
         container.addObject(pathNode)
@@ -82,12 +82,12 @@ class SVGExporter: NSObject
     
     func addPolyline(poly: Polyline)
     {
-        var pathNode = NSXMLElement(name:"polyline")
-        var attributes = NSMutableDictionary(capacity: 3)
+        let pathNode = NSXMLElement(name:"polyline")
+        var attributes = [String: String]()
         attributes["style"] = "stroke:black; fill:none"
         attributes["stroke-width"] = "0.01"
-        let ptStrings = map(poly) { "\($0.x),\($0.y)" }
-        let pathString = " ".join(ptStrings)
+        let ptStrings = poly.map { "\($0.x),\($0.y)" }
+        let pathString = ptStrings.joinWithSeparator(" ")
         attributes["points"] = pathString
         pathNode.setAttributesWithDictionary(attributes)
         container.addObject(pathNode)
@@ -95,9 +95,9 @@ class SVGExporter: NSObject
     
     func exportToXmlNode() -> NSXMLElement
     {
-        var exportNode = NSXMLElement(name: "svg");
+        let exportNode = NSXMLElement(name: "svg");
         let viewBoxString = "\(imageBounds.origin.x) \(imageBounds.origin.y) \(imageBounds.size.width) \(imageBounds.size.height)"
-        let attrib = NSXMLNode.attributeWithName("viewBox", stringValue: viewBoxString) as NSXMLNode
+        let attrib = NSXMLNode.attributeWithName("viewBox", stringValue: viewBoxString) as! NSXMLNode
         exportNode.addAttribute(attrib)
     
         // compute size (in inches)
@@ -110,7 +110,7 @@ class SVGExporter: NSObject
         else
         {
             units = "in";
-            var imageAspect = self.imageBounds.size.width / self.imageBounds.size.height;
+            let imageAspect = self.imageBounds.size.width / self.imageBounds.size.height;
             if( imageAspect > (self.pageSize.width / self.pageSize.height))
             {
                 // image bounds has wider aspect ratio than page --- constrain page width, recompute height
@@ -122,21 +122,21 @@ class SVGExporter: NSObject
             }
         }
         
-        exportNode.addAttribute(NSXMLNode.attributeWithName("width", stringValue: "\(pageSize.width) \(units)") as NSXMLNode)
-        exportNode.addAttribute(NSXMLNode.attributeWithName("height", stringValue: "\(pageSize.height) \(units)") as NSXMLNode)    
+        exportNode.addAttribute(NSXMLNode.attributeWithName("width", stringValue: "\(pageSize.width) \(units)") as! NSXMLNode)
+        exportNode.addAttribute(NSXMLNode.attributeWithName("height", stringValue: "\(pageSize.height) \(units)") as! NSXMLNode)    
     
-        var namespace = NSXMLNode.namespaceWithName("", stringValue:"http://www.w3.org/2000/svg") as NSXMLNode
+        let namespace = NSXMLNode.namespaceWithName("", stringValue:"http://www.w3.org/2000/svg") as! NSXMLNode
         exportNode.namespaces = [namespace];
         
         let transformGroup = NSXMLElement(name:"g")
-        transformGroup.addAttribute(NSXMLNode.attributeWithName("transform", stringValue:"translate(0.5,0.5)") as NSXMLNode)
+        transformGroup.addAttribute(NSXMLNode.attributeWithName("transform", stringValue:"translate(0.5,0.5)") as! NSXMLNode)
         exportNode.addChild(transformGroup)
         
         for entry in self.container
         {
             if(entry.isKindOfClass(NSXMLNode))
             {
-                transformGroup.addChild(entry as NSXMLNode)
+                transformGroup.addChild(entry as! NSXMLNode)
             }
         }
         
@@ -145,8 +145,8 @@ class SVGExporter: NSObject
     
     func getXmlDocument() -> NSXMLDocument
     {
-        var rootNode = self.exportToXmlNode()
-        var xmlDocument = NSXMLDocument(rootElement: rootNode)
+        let rootNode = self.exportToXmlNode()
+        let xmlDocument = NSXMLDocument(rootElement: rootNode)
         xmlDocument.version = "1.0"
         xmlDocument.characterEncoding = "UTF-8"
     
@@ -165,7 +165,7 @@ class SVGExporter: NSObject
 
     func writeToFile(filename: String)
     {
-        var xmlData = self.getXmlData();
+        let xmlData = self.getXmlData();
         xmlData.writeToFile(filename, atomically: true)
     }
 }

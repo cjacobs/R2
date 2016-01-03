@@ -1,6 +1,6 @@
 //
 //  PathView.swift
-//  Fract
+//  R2
 //
 //  Created by Charles Jacobs on 12/11/14.
 //  Copyright (c) 2014 FloydSoft. All rights reserved.
@@ -70,7 +70,7 @@ class PathView : NSView
             // TODO: set translation
             for shape in model.shapes
             {
-                var path = shape.path
+                let path = shape.path
                 if(path != nil)
                 {
                     path.lineWidth = 0.01;

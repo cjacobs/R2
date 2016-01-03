@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  Fract
+//  R2
 //
 //  Created by Charles Jacobs on 12/9/14.
 //  Copyright (c) 2014 FloydSoft. All rights reserved.
@@ -17,6 +17,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var pathView: PathView!
     
+    // Model parameters
+    
     var numSides: Int = 3
     var numSubdivisions: Int = 1
     var isStar: Bool = false
@@ -24,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     var transExtDist: Double = 0.0
     var middleWidth: Double = 0.1
     var starInsideRadius: Double = 0.25
-    var model: FractModel! = nil
+    var scen: Scene! = nil
 
     func applicationDidFinishLaunching(aNotification: NSNotification)
     {
@@ -34,31 +36,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     
     func recomputeModel()
     {
-        model = FractModel()
+        scene = Scene()
         
         if numSides < 2
         {
             return;
         }    
         
-        let fn = {poly in kochSubdivideGeneral(poly, self.perpExtDist, self.transExtDist, self.middleWidth)}
+        let fn = {poly in kochSubdivideGeneral(poly, perpDist: self.perpExtDist, transDist: self.transExtDist, middleWidth: self.middleWidth)}
         var originalPoly: [NSPoint] = []
         if(isStar)
         {
             //        let shape = Shape(originalPoly: makeStar(6, NSPoint(x: 50, y:50), 0, [5, 30, 10, 40])) // cool!
 //            originalPoly = makeStar(numSides, NSPoint(x: 5, y:5), 0, [0.5, 3.0, 0.5, 3.0])
-            originalPoly = makeStar(numSides, NSPoint(x: 5, y:5), 0, [1.0, starInsideRadius])
+            originalPoly = makeStar(numSides, center: NSPoint(x: 5, y:5), startAngle: 0, radii: [1.0, starInsideRadius])
         }
         else
         {
-            originalPoly = makePolygon(numSides, NSPoint(x: 5, y:5), 0, 1.0)
+            originalPoly = makePolygon(numSides, center: NSPoint(x: 5, y:5), startAngle: 0, radius: 1.0)
             
         }
         
         let shape = Shape(originalPoly: originalPoly)
         shape.subdivideFunc = fn
         shape.subdivisionLevel = numSubdivisions
-        model.shapes.append(shape)
+        scene.shapes.append(shape)
         
         recomputePaths()
     }
@@ -70,9 +72,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
 
     func recomputePaths()
     {
-        model.computePaths()
+        scene.computePaths()
 
         pathView.findBoundingBox()
+        
         // TODO: figure out scale
         pathView.setScale(NSSize(width: 60.0, height: 60.0))
         pathView.needsDisplay = true
@@ -85,7 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     
     @IBAction func numSubdivisionsChanged(sender: NSControl)
     {
-        for shape in model.shapes
+        for shape in scene.shapes
         {
             shape.subdivisionLevel = numSubdivisions
         }
@@ -97,11 +100,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     
     @IBAction func saveSvg(sender: AnyObject)
     {
-        var exporter = SVGExporter()
-        let bbox = model.getBbox()
+        let exporter = SVGExporter()
+        let bbox = scene.getBbox()
         exporter.pageSize = bbox.size
         exporter.imageBounds = bbox
-        for shape in model.shapes
+        for shape in scene.shapes
         {
             exporter.addPolyline(shape.getPoly())
         }
