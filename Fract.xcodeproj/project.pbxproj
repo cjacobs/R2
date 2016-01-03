@@ -7,10 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		44C9EF0E1A3BA0E9008F20E6 /* FractModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C9EF0D1A3BA0E9008F20E6 /* FractModel.swift */; };
 		44D298041A3763A3003766C2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D298031A3763A3003766C2 /* AppDelegate.swift */; };
 		44D298061A3763A3003766C2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 44D298051A3763A3003766C2 /* Images.xcassets */; };
 		44D298091A3763A3003766C2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44D298071A3763A3003766C2 /* MainMenu.xib */; };
 		44D298151A3763A3003766C2 /* FractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D298141A3763A3003766C2 /* FractTests.swift */; };
+		44D3133B1A3AC1BD003F34ED /* PathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D3133A1A3AC1BD003F34ED /* PathView.swift */; };
+		44D3133D1A3AC370003F34ED /* NSPointMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D3133C1A3AC370003F34ED /* NSPointMath.swift */; };
+		44D3133F1A3AC3BD003F34ED /* Snowflake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D3133E1A3AC3BD003F34ED /* Snowflake.swift */; };
+		44D575511A466D2A00A0614A /* SVGExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D575501A466D2A00A0614A /* SVGExporter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		44C9EF0D1A3BA0E9008F20E6 /* FractModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FractModel.swift; sourceTree = "<group>"; };
 		44D297FE1A3763A3003766C2 /* Fract.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fract.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		44D298021A3763A3003766C2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		44D298031A3763A3003766C2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -32,6 +38,11 @@
 		44D2980E1A3763A3003766C2 /* FractTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FractTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		44D298131A3763A3003766C2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		44D298141A3763A3003766C2 /* FractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FractTests.swift; sourceTree = "<group>"; };
+		44D2981E1A37660E003766C2 /* FractPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = FractPlayground.playground; sourceTree = "<group>"; };
+		44D3133A1A3AC1BD003F34ED /* PathView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PathView.swift; sourceTree = "<group>"; };
+		44D3133C1A3AC370003F34ED /* NSPointMath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSPointMath.swift; sourceTree = "<group>"; };
+		44D3133E1A3AC3BD003F34ED /* Snowflake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Snowflake.swift; sourceTree = "<group>"; };
+		44D575501A466D2A00A0614A /* SVGExporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SVGExporter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,9 +85,15 @@
 			isa = PBXGroup;
 			children = (
 				44D298031A3763A3003766C2 /* AppDelegate.swift */,
+				44C9EF0D1A3BA0E9008F20E6 /* FractModel.swift */,
+				44D3133A1A3AC1BD003F34ED /* PathView.swift */,
+				44D3133E1A3AC3BD003F34ED /* Snowflake.swift */,
+				44D2981E1A37660E003766C2 /* FractPlayground.playground */,
+				44D3133C1A3AC370003F34ED /* NSPointMath.swift */,
 				44D298051A3763A3003766C2 /* Images.xcassets */,
 				44D298071A3763A3003766C2 /* MainMenu.xib */,
 				44D298011A3763A3003766C2 /* Supporting Files */,
+				44D575501A466D2A00A0614A /* SVGExporter.swift */,
 			);
 			path = Fract;
 			sourceTree = "<group>";
@@ -150,6 +167,7 @@
 		44D297F61A3763A3003766C2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = FloydSoft;
 				TargetAttributes = {
@@ -205,7 +223,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				44D3133F1A3AC3BD003F34ED /* Snowflake.swift in Sources */,
+				44D3133D1A3AC370003F34ED /* NSPointMath.swift in Sources */,
 				44D298041A3763A3003766C2 /* AppDelegate.swift in Sources */,
+				44D575511A466D2A00A0614A /* SVGExporter.swift in Sources */,
+				44D3133B1A3AC1BD003F34ED /* PathView.swift in Sources */,
+				44C9EF0E1A3BA0E9008F20E6 /* FractModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -393,6 +416,7 @@
 				44D2981A1A3763A3003766C2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		44D2981B1A3763A3003766C2 /* Build configuration list for PBXNativeTarget "FractTests" */ = {
 			isa = XCConfigurationList;
@@ -401,6 +425,7 @@
 				44D2981D1A3763A3003766C2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
