@@ -6,9 +6,11 @@
 //  Copyright (c) 2014 FloydSoft. All rights reserved.
 //
 
+//
+// TODO: keep list of layers, which turn into <g> nodes, I guess
+//
+
 import Cocoa
-
-
 
 class SVGExporter: NSObject
 {
@@ -25,6 +27,66 @@ class SVGExporter: NSObject
     {
         
     }
+    
+    func addRect(rect: NSRect, withLayer: String, andColorIndex: Int)
+    {
+        
+    }
+    
+    func addPath(path: NSBezierPath)
+    {
+        NSLog("adding path");
+        let pathNode = NSXMLElement(name:"path")
+        var attributes = [String: String]()
+        attributes["style"] = "stroke:black; fill:none"
+        attributes["stroke-width"] = "0.01"
+        
+        attributes["d"] = getStringForPath(path)
+        pathNode.setAttributesWithDictionary(attributes)
+        container.addObject(pathNode)
+    }
+    
+    // TODO: implement layer and color stuff
+    func addPath(path: NSBezierPath, withLayer: String, andColorIndex: Int)
+    {
+        NSLog("adding path");
+        let pathNode = NSXMLElement(name:"path")
+        var attributes = [String: String]()
+        attributes["style"] = "stroke:black; fill:none"
+        attributes["stroke-width"] = "0.01"
+        attributes["fill"] = "none";
+        
+        attributes["d"] = getStringForPath(path)
+        pathNode.setAttributesWithDictionary(attributes)
+        container.addObject(pathNode)
+    }
+
+    func addPolygon(poly: Polygon)
+    {
+        let pathNode = NSXMLElement(name:"polygon")
+        var attributes = [String: String]()
+        attributes["style"] = "stroke:black; fill:none"
+        attributes["stroke-width"] = "0.01"
+        let ptStrings = poly.map { "\($0.x),\($0.y)" }
+        let pathString = ptStrings.joinWithSeparator(" ")
+        attributes["points"] = pathString
+        pathNode.setAttributesWithDictionary(attributes)
+        container.addObject(pathNode)
+    }
+    
+    func addPolyline(poly: Polyline)
+    {
+        let pathNode = NSXMLElement(name:"polyline")
+        var attributes = [String: String]()
+        attributes["style"] = "stroke:black; fill:none"
+        attributes["stroke-width"] = "0.01"
+        let ptStrings = poly.map { "\($0.x),\($0.y)" }
+        let pathString = ptStrings.joinWithSeparator(" ")
+        attributes["points"] = pathString
+        pathNode.setAttributesWithDictionary(attributes)
+        container.addObject(pathNode)
+    }
+    
     
     func getStringForPath(path: NSBezierPath) -> String
     {
@@ -54,44 +116,12 @@ class SVGExporter: NSObject
         return resultString;
     }
     
-    func addPath(path: NSBezierPath)
+    func writeToFile(filename: String)
     {
-        NSLog("adding path");
-        let pathNode = NSXMLElement(name:"path")
-        var attributes = [String: String]()
-        attributes["style"] = "stroke:black; fill:none"
-        attributes["stroke-width"] = "0.01"
-        
-        attributes["d"] = getStringForPath(path)
-        pathNode.setAttributesWithDictionary(attributes)
-        container.addObject(pathNode)
+        let xmlData = self.getXmlData();
+        xmlData.writeToFile(filename, atomically: true)
     }
-    
-    func addPolygon(poly: Polygon)
-    {
-        let pathNode = NSXMLElement(name:"polygon")
-        var attributes = [String: String]()
-        attributes["style"] = "stroke:black; fill:none"
-        attributes["stroke-width"] = "0.01"
-        let ptStrings = poly.map { "\($0.x),\($0.y)" }
-        let pathString = ptStrings.joinWithSeparator(" ")
-        attributes["points"] = pathString
-        pathNode.setAttributesWithDictionary(attributes)
-        container.addObject(pathNode)
-    }
-    
-    func addPolyline(poly: Polyline)
-    {
-        let pathNode = NSXMLElement(name:"polyline")
-        var attributes = [String: String]()
-        attributes["style"] = "stroke:black; fill:none"
-        attributes["stroke-width"] = "0.01"
-        let ptStrings = poly.map { "\($0.x),\($0.y)" }
-        let pathString = ptStrings.joinWithSeparator(" ")
-        attributes["points"] = pathString
-        pathNode.setAttributesWithDictionary(attributes)
-        container.addObject(pathNode)
-    }
+
     
     func exportToXmlNode() -> NSXMLElement
     {
@@ -161,11 +191,5 @@ class SVGExporter: NSObject
     func getXmlData() -> NSData
     {
         return getXmlDocument().XMLDataWithOptions(Int(NSXMLDocumentTidyXML|NSXMLNodePrettyPrint))
-    }
-
-    func writeToFile(filename: String)
-    {
-        let xmlData = self.getXmlData();
-        xmlData.writeToFile(filename, atomically: true)
     }
 }

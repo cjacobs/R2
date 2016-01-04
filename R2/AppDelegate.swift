@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     var transExtDist: Double = 0.0
     var middleWidth: Double = 0.1
     var starInsideRadius: Double = 0.25
-    var scen: Scene! = nil
+    var scene: Scene! = nil
 
     func applicationDidFinishLaunching(aNotification: NSNotification)
     {
@@ -38,29 +38,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     {
         scene = Scene()
         
-        if numSides < 2
-        {
-            return;
-        }    
-        
-        let fn = {poly in kochSubdivideGeneral(poly, perpDist: self.perpExtDist, transDist: self.transExtDist, middleWidth: self.middleWidth)}
-        var originalPoly: [NSPoint] = []
-        if(isStar)
-        {
-            //        let shape = Shape(originalPoly: makeStar(6, NSPoint(x: 50, y:50), 0, [5, 30, 10, 40])) // cool!
-//            originalPoly = makeStar(numSides, NSPoint(x: 5, y:5), 0, [0.5, 3.0, 0.5, 3.0])
-            originalPoly = makeStar(numSides, center: NSPoint(x: 5, y:5), startAngle: 0, radii: [1.0, starInsideRadius])
-        }
-        else
-        {
-            originalPoly = makePolygon(numSides, center: NSPoint(x: 5, y:5), startAngle: 0, radius: 1.0)
-            
-        }
-        
-        let shape = Shape(originalPoly: originalPoly)
-        shape.subdivideFunc = fn
-        shape.subdivisionLevel = numSubdivisions
-        scene.shapes.append(shape)
+//        scene.shapes.append(shape)
         
         recomputePaths()
     }
@@ -88,11 +66,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     
     @IBAction func numSubdivisionsChanged(sender: NSControl)
     {
-        for shape in scene.shapes
-        {
-            shape.subdivisionLevel = numSubdivisions
-        }
-        
         recomputePaths()
     }
 
@@ -104,12 +77,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
         let bbox = scene.getBbox()
         exporter.pageSize = bbox.size
         exporter.imageBounds = bbox
-        for shape in scene.shapes
+        
+        for layer in scene.layers.values
         {
-            exporter.addPolyline(shape.getPoly())
+            for shape in layer
+            {
+                exporter.addPolyline(shape.getPoly()) // ???
+            }
         }
         
-        exporter.writeToFile("/Users/cjacobs/Dev/Fract/output/" + filename)
+        exporter.writeToFile("/Users/cjacobs/Dev/R2/output/" + filename)
     }
     
     var numSliders = 1

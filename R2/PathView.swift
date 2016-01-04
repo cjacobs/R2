@@ -48,15 +48,15 @@ class PathView : NSView
     func findBoundingBox() -> NSRect
     {
         var result = NSRect()
-        let model = delegate.model
-        let bbox = model.getBbox()
+        let scene = delegate.scene
+        let bbox = scene.getBbox()
         
         return bbox
     }
     
     override func drawRect(dirtyRect: NSRect)
     {
-        let model = delegate.model
+        let model = delegate.scene
         if(model != nil)
         {
             self.resetScaling()
@@ -68,14 +68,19 @@ class PathView : NSView
             setScale(NSSize(width: minScale, height: minScale))
             self.bounds.origin = bbox.origin
             // TODO: set translation
-            for shape in model.shapes
+            
+            for layer in model.layers.values
             {
-                let path = shape.path
-                if(path != nil)
+                for shape in layer
                 {
-                    path.lineWidth = 0.01;
-                    path.stroke()
+                    let path = shape.path
+                    if(path != nil)
+                    {
+                        path.lineWidth = 0.01;
+                        path.stroke()
+                    }
                 }
+                
             }
         }
     }
