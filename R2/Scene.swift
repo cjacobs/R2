@@ -18,25 +18,13 @@ typealias ShapeList = [Shape]
 class Scene: NSObject
 {
     var layers: [String: ShapeList] = [String:ShapeList]()
-//    var shapes: [Shape] = []
     
-    func computePaths()
-    {
-        for layer in layers.values
-        {
-            for shape in layer
-            {
-                shape.computePath()
-            }
-        }
-    }
-
     func addShape(shape: Shape)
     {
         let shapeLayer = shape.layer
-        if var layer = layers[shapeLayer]
+        if layers.indexForKey(shapeLayer) != nil
         {
-            layer.append(shape)
+            layers[shapeLayer]!.append(shape)
         }
         else
         {
@@ -45,31 +33,52 @@ class Scene: NSObject
     }
     
     func getBbox() -> NSRect
-    {
+    {        
         var minPt: NSPoint = NSPoint()
         var maxPt: NSPoint = NSPoint()
-
+        var bounds: NSRect = NSRect()
         var first = true
         for layer in layers.values
         {
             for shape in layer
             {
-                let poly = shape.getPoly()
+                let foo = shape.path
+                let pathBounds = shape.path.bounds
                 if first
                 {
-                    minPt = poly[0]
-                    maxPt = minPt
+                    bounds = pathBounds
                     first = false
                 }
-                for pt in poly
+                else
                 {
-                    minPt = NSPoint(x: min(minPt.x, pt.x), y: min(minPt.y, pt.y))
-                    maxPt = NSPoint(x: max(maxPt.x, pt.x), y: max(maxPt.y, pt.y))
+                    bounds = NSUnionRect(bounds, pathBounds)
                 }
+/*
+                
+                let poly = shape.getPoly()
+                
+                if poly.count > 0
+                {
+                    if first
+                    {
+                        minPt = poly[0]
+                        maxPt = minPt
+                        first = false
+                    }
+                    for pt in poly
+                    {
+                        minPt = NSPoint(x: min(minPt.x, pt.x), y: min(minPt.y, pt.y))
+                        maxPt = NSPoint(x: max(maxPt.x, pt.x), y: max(maxPt.y, pt.y))
+                    }
+                        
+                }
+*/
             }
         }
         
-        let size = maxPt-minPt
-        return NSRect(origin: minPt, size: NSSize(width:size.x, height:size.y))
+        
+        return bounds
+//        let size = maxPt-minPt
+//        return NSRect(origin: minPt, size: NSSize(width:size.x, height:size.y))
     }
 }

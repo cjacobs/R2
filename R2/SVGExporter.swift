@@ -12,6 +12,9 @@
 
 import Cocoa
 
+typealias Polygon = [NSPoint]
+typealias Polyline = [NSPoint]
+
 class SVGExporter: NSObject
 {
     var imageBounds: NSRect = NSRect()
@@ -39,7 +42,7 @@ class SVGExporter: NSObject
         let pathNode = NSXMLElement(name:"path")
         var attributes = [String: String]()
         attributes["style"] = "stroke:black; fill:none"
-        attributes["stroke-width"] = "0.01"
+        attributes["stroke-width"] = "1"
         
         attributes["d"] = getStringForPath(path)
         pathNode.setAttributesWithDictionary(attributes)
@@ -53,7 +56,7 @@ class SVGExporter: NSObject
         let pathNode = NSXMLElement(name:"path")
         var attributes = [String: String]()
         attributes["style"] = "stroke:black; fill:none"
-        attributes["stroke-width"] = "0.01"
+        attributes["stroke-width"] = "1"
         attributes["fill"] = "none";
         
         attributes["d"] = getStringForPath(path)

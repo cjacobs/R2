@@ -47,8 +47,7 @@ class PathView : NSView
     
     func findBoundingBox() -> NSRect
     {
-        var result = NSRect()
-        let scene = delegate.scene
+        let scene = delegate.r2Model.scene
         let bbox = scene.getBbox()
         
         return bbox
@@ -56,31 +55,39 @@ class PathView : NSView
     
     override func drawRect(dirtyRect: NSRect)
     {
-        let model = delegate.scene
-        if(model != nil)
+        let model = delegate.r2Model.scene
+
+        self.resetScaling()
+        let bounds = self.bounds
+        let bbox = model.getBbox()
+        let xScale = bounds.width / bbox.width
+        let yScale = bounds.height / bbox.height
+        let minScale = min(xScale, yScale)
+        setScale(NSSize(width: minScale, height: minScale))
+        self.bounds.origin = bbox.origin
+        // TODO: set translation
+        
+        for layer in model.layers.values
         {
-            self.resetScaling()
-            let bounds = self.bounds
-            let bbox = model.getBbox()
-            let xScale = bounds.width / bbox.width
-            let yScale = bounds.height / bbox.height
-            let minScale = min(xScale, yScale)
-            setScale(NSSize(width: minScale, height: minScale))
-            self.bounds.origin = bbox.origin
-            // TODO: set translation
-            
-            for layer in model.layers.values
+            for shape in layer
             {
-                for shape in layer
+                let path = shape.path
+                if(path != nil)
                 {
-                    let path = shape.path
-                    if(path != nil)
+                    let layer = shape.layer
+                    if layer == "cut"
                     {
-                        path.lineWidth = 0.01;
-                        path.stroke()
+                        path.lineWidth = 0.2
                     }
+                    else if layer == "fold"
+                    {
+                        path.lineWidth = 0.05
+                        let pattern: [CGFloat] = [4.0, 2.0]
+                        path.setLineDash(pattern, count: 2, phase: 0);
+                    }
+
+                    path.stroke()
                 }
-                
             }
         }
     }

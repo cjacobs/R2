@@ -19,15 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     
     // Model parameters
     
-    var numSides: Int = 3
-    var numSubdivisions: Int = 1
-    var isStar: Bool = false
-    var perpExtDist: Double = 2.0
-    var transExtDist: Double = 0.0
-    var middleWidth: Double = 0.1
-    var starInsideRadius: Double = 0.25
-    var scene: Scene! = nil
-
+    var r2Model: R2Model = R2Model()
+    
     func applicationDidFinishLaunching(aNotification: NSNotification)
     {
         // Init UI stuff
@@ -36,10 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
     
     func recomputeModel()
     {
-        scene = Scene()
-        
-//        scene.shapes.append(shape)
-        
+//        r2Model.recompute()
         recomputePaths()
     }
 
@@ -50,8 +40,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
 
     func recomputePaths()
     {
-        scene.computePaths()
-
         pathView.findBoundingBox()
         
         // TODO: figure out scale
@@ -64,15 +52,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
         recomputeModel()
     }
     
-    @IBAction func numSubdivisionsChanged(sender: NSControl)
-    {
-        recomputePaths()
-    }
 
     var filename: String = "out.svg"
     
     @IBAction func saveSvg(sender: AnyObject)
     {
+        let scene = r2Model.scene
         let exporter = SVGExporter()
         let bbox = scene.getBbox()
         exporter.pageSize = bbox.size
@@ -82,7 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSTableViewDelegate, NSTable
         {
             for shape in layer
             {
-                exporter.addPolyline(shape.getPoly()) // ???
+                exporter.addPath(shape.path, withLayer: shape.layer, andColorIndex: shape.colorIndex)
             }
         }
         

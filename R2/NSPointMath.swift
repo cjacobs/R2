@@ -45,3 +45,8 @@ func / (pt: NSPoint, s: Double) -> NSPoint
     return NSPoint(x: pt.x / CGFloat(s), y: pt.y / CGFloat(s))
 }
 
+// this should go in some other file:
+func chordLength(angle: Double) -> Double
+{
+    return 2.0 * sin(angle/2.0)
+}
