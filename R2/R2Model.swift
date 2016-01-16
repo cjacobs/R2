@@ -74,9 +74,7 @@ class R2Model : NSObject
     func bodySegmentWidth() -> Double
     {
         let pi = M_PI
-        let w = chordLength(2.0*pi / Double(numBodySegments)) * bodyRadius
-        print("Body segment width: ", w)
-        return w
+        return chordLength(2.0*pi / Double(numBodySegments)) * bodyRadius
     }
 
     func totalBodyWidth() -> Double
@@ -299,55 +297,74 @@ class R2Model : NSObject
     func getLegCutPath() -> NSBezierPath
     {
         // let legBottomFlapHeight = 0.75 * legBottomHeight;
-        let x = legOffset + legRadius + legTopExtraHeight;
-        let legBottomFlapHeight = bodyHeight - x - legTransitionHeight
+        let remainder = legOffset + legRadius + legTopExtraHeight;
+        let legBottomFlapHeight = bodyHeight - remainder - legTransitionHeight
         let legBottomNoFlapHeight = legBottomHeight - legBottomFlapHeight
         
         let legPath = NSBezierPath()
-        let endAngle = 255.0 // degrees
-        let endAngleDiffRad = (270.0-endAngle) * 2.0 * M_PI / 360.0
-        legPath.appendBezierPathWithArcWithCenter(NSPoint(x:legRadius, y: legRadius), radius: CGFloat(legRadius), startAngle: 90, endAngle: CGFloat(endAngle))
+        let angleOffset = 15.0 // degrees
+        let startAngle = 0
+        let endAngle = -180+angleOffset
+        let endAngleDiffRad = (angleOffset) * 2.0 * M_PI / 360.0
+        legPath.appendBezierPathWithArcWithCenter(NSPoint(x:legRadius, y: legRadius), radius: CGFloat(legRadius), startAngle: CGFloat(startAngle), endAngle: CGFloat(endAngle), clockwise: true)
 
         // patch to wrap around top
         let legTopCirc = M_PI * legRadius;
-        let legPatchStartX = sin(endAngleDiffRad) * legRadius
-        legPath.lineToPoint(NSPoint(x: legRadius - legPatchStartX,y: 0))
-        legPath.relativeLineToPoint(NSPoint(x: -(legTopCirc-legPatchStartX-tabWidth), y: 0))
-        legPath.relativeLineToPoint(NSPoint(x: 0, y: tabDepth))
-        legPath.relativeLineToPoint(NSPoint(x: -tabWidth, y: 0))
-        legPath.relativeLineToPoint(NSPoint(x: 0, y: -tabDepth))
-        legPath.relativeLineToPoint(NSPoint(x: 0, y: -legDepth))
-        legPath.relativeLineToPoint(NSPoint(x: legTopCirc, y: 0))
-        legPath.relativeLineToPoint(NSPoint(x: 0, y: legDepth))
+        let legPatchStartY = sin(endAngleDiffRad) * legRadius
+        legPath.lineToPoint(NSPoint(x: 0, y: legRadius - legPatchStartY))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: -(legTopCirc-legPatchStartY-tabWidth)))
+        legPath.relativeLineToPoint(NSPoint(x: tabDepth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: -tabWidth))
+        legPath.relativeLineToPoint(NSPoint(x: -tabDepth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: -legDepth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: legTopCirc))
+        legPath.relativeLineToPoint(NSPoint(x: legDepth, y: 0))
 
         // upper leg
-        legPath.moveToPoint(NSPoint(x:legRadius, y: 0))
-        legPath.relativeLineToPoint(NSPoint(x:0, y: -legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legTopExtraHeight, y:0))
-        legPath.relativeLineToPoint(NSPoint(x:0, y: legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legTransitionHeight, y:(2*legRadius - legWidth)/2))
+        legPath.moveToPoint(NSPoint(x: 0, y: legRadius))
+        legPath.relativeLineToPoint(NSPoint(x: -legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y:legTopExtraHeight))
+        legPath.relativeLineToPoint(NSPoint(x: legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x:(2*legRadius - legWidth)/2, y: legTransitionHeight))
         // lower leg
-        legPath.relativeLineToPoint(NSPoint(x:0, y: -legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legBottomFlapHeight, y:0)) // problem: dont want this flap to extend all the way down
-        legPath.relativeLineToPoint(NSPoint(x:0, y: legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legBottomNoFlapHeight, y:0)) // problem: dont want this flap to extend all the way down
+        legPath.relativeLineToPoint(NSPoint(x: -legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y:legBottomFlapHeight))
+        legPath.relativeLineToPoint(NSPoint(x: legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: legBottomNoFlapHeight))
         
-        legPath.relativeLineToPoint(NSPoint(x:footHeight, y: -(footWidth-legWidth)/2))
-        legPath.relativeLineToPoint(NSPoint(x:0, y:footWidth))
+        // foot
+        //legPath.relativeLineToPoint(NSPoint(x: -(footWidth-legWidth)/2, y: footHeight)) // TODO: remove this, replace with flap for something
+        let footEdge1 = NSPoint(x: -(footWidth-legWidth)/2, y: footHeight)
+        legPath.relativeLineToPoint(-normalize(perpVec(footEdge1)) * legDepth)
+        legPath.relativeLineToPoint(footEdge1)
+        legPath.relativeLineToPoint(normalize(perpVec(footEdge1)) * legDepth)
+
+        legPath.relativeLineToPoint(NSPoint(x:0, y: legDepth))
+        legPath.relativeLineToPoint(NSPoint(x: (footWidth-legWidth)/2, y: footHeight))
+        legPath.relativeLineToPoint(NSPoint(x: legWidth, y: 0))
         
         // upper leg
-        legPath.moveToPoint(NSPoint(x:legRadius, y: 2*legRadius))
-        legPath.relativeLineToPoint(NSPoint(x:0, y: legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legTopExtraHeight, y:0))
-        legPath.relativeLineToPoint(NSPoint(x:0, y: -legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legTransitionHeight, y:-(2*legRadius - legWidth)/2))
+        legPath.moveToPoint(NSPoint(x: 2*legRadius, y: legRadius))
+        legPath.relativeLineToPoint(NSPoint(x:legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: legTopExtraHeight))
+        legPath.relativeLineToPoint(NSPoint(x: -legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x:-(2*legRadius - legWidth)/2, y: legTransitionHeight))
         // lower leg
-        legPath.relativeLineToPoint(NSPoint(x:0, y: legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legBottomFlapHeight, y:0)) // problem
-        legPath.relativeLineToPoint(NSPoint(x:0, y: -legFlapWidth))
-        legPath.relativeLineToPoint(NSPoint(x:legBottomNoFlapHeight, y:0)) // problem
-        legPath.relativeLineToPoint(NSPoint(x:footHeight, y: (footWidth-legWidth)/2))
+        legPath.relativeLineToPoint(NSPoint(x: legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y:legBottomFlapHeight))
+        legPath.relativeLineToPoint(NSPoint(x: -legFlapWidth, y: 0))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: legBottomNoFlapHeight))
+
+//        legPath.relativeLineToPoint(NSPoint(x: (footWidth-legWidth)/2, y: footHeight))
+        let footEdge2 = NSPoint(x: (footWidth-legWidth)/2, y: footHeight)
+        legPath.relativeLineToPoint(normalize(perpVec(footEdge2)) * legDepth)
+        legPath.relativeLineToPoint(footEdge2)
+        legPath.relativeLineToPoint(-normalize(perpVec(footEdge2)) * legDepth)
+
         
+        legPath.relativeLineToPoint(NSPoint(x:0, y: legDepth))
+        legPath.relativeLineToPoint(NSPoint(x: -(footWidth-legWidth)/2, y: footHeight))
+
         
         // TODO: bottom of foot
         // other side of foot
@@ -358,22 +375,28 @@ class R2Model : NSObject
 
     func getLegFoldPath() -> NSBezierPath
     {
+        let legTopCirc = M_PI * legRadius;
         let legPath = NSBezierPath()
 
         // TODO: add fold for tab on wraparound patch
+        legPath.moveToPoint(NSPoint(x: 0, y: -(legTopCirc-legRadius)))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: tabWidth))
         
-        legPath.moveToPoint(NSPoint(x:legRadius, y: 0))
-        legPath.relativeLineToPoint(NSPoint(x:legTopExtraHeight, y:0))
-        legPath.relativeLineToPoint(NSPoint(x:legTransitionHeight, y:(2*legRadius - legWidth)/2))
-        legPath.relativeLineToPoint(NSPoint(x:legBottomHeight, y:0))
-        legPath.relativeLineToPoint(NSPoint(x:footHeight, y: -(footWidth-legWidth)/2))
-        legPath.relativeLineToPoint(NSPoint(x:0, y:footWidth))
+        legPath.moveToPoint(NSPoint(x:0, y: legRadius))
+        legPath.relativeLineToPoint(NSPoint(x:0, y: legTopExtraHeight))
+        legPath.relativeLineToPoint(NSPoint(x:(2*legRadius - legWidth)/2, y: legTransitionHeight))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: legBottomHeight))
         
-        legPath.moveToPoint(NSPoint(x:legRadius, y: 2*legRadius))
-        legPath.relativeLineToPoint(NSPoint(x:legTopExtraHeight, y:0))
-        legPath.relativeLineToPoint(NSPoint(x:legTransitionHeight, y:-(2*legRadius - legWidth)/2))
-        legPath.relativeLineToPoint(NSPoint(x:legBottomHeight, y:0))
-        legPath.relativeLineToPoint(NSPoint(x:footHeight, y: (footWidth-legWidth)/2))
+        legPath.relativeLineToPoint(NSPoint(x: -(footWidth-legWidth)/2, y: footHeight))
+        legPath.relativeLineToPoint(NSPoint(x: footWidth, y: 0))
+        legPath.relativeMoveToPoint(NSPoint(x: 0, y: legDepth))
+        legPath.relativeLineToPoint(NSPoint(x:-footWidth, y: 0))
+        
+        legPath.moveToPoint(NSPoint(x: 2*legRadius, y: legRadius))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: legTopExtraHeight))
+        legPath.relativeLineToPoint(NSPoint(x:-(2*legRadius - legWidth)/2, y: legTransitionHeight))
+        legPath.relativeLineToPoint(NSPoint(x: 0, y: legBottomHeight))
+        legPath.relativeLineToPoint(NSPoint(x: (footWidth-legWidth)/2, y: footHeight))
         
         return legPath
     }
@@ -385,7 +408,7 @@ class R2Model : NSObject
         let legCutPath = getLegCutPath()
         let legFoldPath = getLegFoldPath()
         let xform = NSAffineTransform()
-        xform.translateXBy(0, yBy: CGFloat(bodyHeight*1.2))
+        xform.translateXBy(0, yBy: CGFloat(bodyHeight) - legCutPath.bounds.origin.y + 10)
         cutPath.appendBezierPath(xform.transformBezierPath(legCutPath))
         foldPath.appendBezierPath(xform.transformBezierPath(legFoldPath))
 
